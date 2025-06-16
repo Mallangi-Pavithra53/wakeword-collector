@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wake Word Recorder</title>
+</head>
+<body>
+  <h1>Wake Word Data Collection</h1>
+
+  <form id="metaForm">
+    <label>
+      Your Name or Email: <br>
+      <input type="text" name="username" placeholder="john@example.com" required>
+    </label>
+    <br><br>
+    <label>
+      <input type="checkbox" required>
+      I consent to my voice being used for wake word training.
+    </label>
+    <br><br>
+  </form>
+
+  <button onclick="startRecording()"> Start Recording</button>
+  <button onclick="stopRecording()"> Stop & Upload</button>
+
+  <br><br>
+  <audio id="player" controls></audio>
+
+  <script src="/static/recorder.js"></script>
+</body>
+</html>
