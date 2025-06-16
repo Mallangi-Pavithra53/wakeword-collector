@@ -3,38 +3,35 @@ from flask_cors import CORS
 import os
 from datetime import datetime
 
-# Create Flask app
-app = Flask(__name__, template_folder="templates", static_folder="static")
+app = Flask(__name__)
 CORS(app)
 
-# Directory to save uploaded audio files
+# Ensure the uploads folder exists
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Home route – renders index.html
-@app.route('/')
+@app.route("/")
 def index():
     return render_template("index.html")
 
-# Upload route – handles audio blob + username
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload():
-    file = request.files.get('file')
-    username = request.form.get('username', 'anonymous').replace(" ", "_")
+    if 'audio_data' not in request.files:
+        return "No audio data part", 400
 
-    if file:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{username}_{timestamp}.wav"
-        save_path = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(save_path)
+    file = request.files['audio_data']
+    if file.filename == '':
+        return "No selected file", 400
 
-        # Optional logging
-        with open("log.csv", "a") as log:
-            log.write(f"{username},{filename},{datetime.now()}\n")
+    # Generate unique filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"wakeword_{timestamp}.webm"
+    save_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(save_path)
 
-        return f"Uploaded as {filename}"
-    return "No file received", 400
+    return "Upload successful", 200
 
-# Run the Flask app
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Render requires host=0.0.0.0 and PORT from env
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
